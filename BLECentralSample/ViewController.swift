@@ -69,9 +69,31 @@ extension ViewController: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("⭕️ connection is success")
+        
+        peripheral.delegate = self
+        peripheral.discoverServices(nil)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         print("‼️ connection failed")
+    }
+}
+
+extension ViewController: CBPeripheralDelegate {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard let services = peripheral.services else {
+            return
+        }
+        print("\(services.count)個のサービスを発見！ \(services)")
+        services.forEach { service in
+            peripheral.discoverCharacteristics(nil, for: service)
+        }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard let characteristics = service.characteristics else {
+            return
+        }
+        print("\(characteristics.count)個のキャラクタリスティックを発見！ \(characteristics)")
     }
 }
