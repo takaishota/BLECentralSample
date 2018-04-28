@@ -95,5 +95,17 @@ extension ViewController: CBPeripheralDelegate {
             return
         }
         print("\(characteristics.count)個のキャラクタリスティックを発見！ \(characteristics)")
+        characteristics
+            .filter { $0.properties == .read }
+            .forEach { peripheral.readValue(for: $0) }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        if characteristic.uuid.isEqual(CBUUID(string: "2A38")) {
+            if let value = characteristic.value {
+                print("HEART RATE: \(value[0])")
+                print("読み出し成功！ service uuid: \(characteristic.service.uuid), characteristic uuid: \(characteristic.uuid), value: \(String(describing: value[0]))")
+            }
+        }
     }
 }
